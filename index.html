@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숨은 이미지 찾기 게임</title>
+    <style>
+        /* 남색 배경 (#222272) */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222272;
+            overflow: hidden;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+
+        /* 청회색 중앙 글씨칸 */
+        #center-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #5c6bc0; /* 청회색 */
+            color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+            z-index: 10; /* 글씨칸이 이미지보다 위에 오도록 설정 */
+        }
+
+        /* 숨겨진 1x1 크기의 타겟 버튼 */
+        #target-pixel {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background-color: #222272; /* 배경색과 동일 */
+            border: none;
+            padding: 0;
+            /* 마우스 커서가 올라가도 포인터(손가락)로 변하지 않게 하여 난이도 상승 */
+            cursor: default; 
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 중앙 안내 문구 -->
+    <div id="center-box">arnoldi 이미지를 찾으시오</div>
+
+    <!-- 숨겨진 버튼 (클릭 시 이미지 다운로드) -->
+    <button id="target-pixel" title="정답"></button>
+
+    <script>
+        // 보내주신 1x1 크기의 83바이트(83b) 실제 남색 이미지 데이터
+        const base64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mMyInb6DwACbQFx690isAAAAABJRU5ErkJggg==";
+        
+        const target = document.getElementById('target-pixel');
+        const centerBox = document.getElementById('center-box');
+
+        // 랜덤 위치 배치 함수 (중앙 글씨칸 영역 제외)
+        function spawnTarget() {
+            const boxRect = centerBox.getBoundingClientRect();
+            let randomX, randomY;
+            let insideBox = true;
+
+            // 중앙 글씨칸과 겹치지 않을 때까지 무한 반복하여 좌표 생성
+            while (insideBox) {
+                randomX = Math.floor(Math.random() * (window.innerWidth - 1));
+                randomY = Math.floor(Math.random() * (window.innerHeight - 1));
+
+                // 생성된 좌표가 중앙 박스 영역 내부인지 확인
+                if (
+                    randomX >= boxRect.left && randomX <= boxRect.right &&
+                    randomY >= boxRect.top && randomY <= boxRect.bottom
+                ) {
+                    insideBox = true;
+                } else {
+                    insideBox = false;
+                }
+            }
+
+            // 위치 지정
+            target.style.left = randomX + 'px';
+            target.style.top = randomY + 'px';
+        }
+
+        // 페이지 로드 시 타겟 배치
+        window.onload = spawnTarget;
+        // 창 크기가 바뀔 때를 대비해 재배치 이벤트 등록
+        window.onresize = spawnTarget;
+
+        // 클릭 시 자동 다운로드 기능
+        target.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = base64Image;
+    link.download = 'ㄳ.png'; // 다운로드될 파일명을 'ㄳ'로 변경
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('arnoldi를 잡았군요.이제 다시 하세요.');
+            spawnTarget(); // 다음 게임을 위해 재배치
+        });
+    </script>
+</body>
+</html>
