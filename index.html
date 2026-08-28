@@ -25,13 +25,23 @@
             transform: translate(-50%, -50%);
             background-color: #5c6bc0; /* 청회색 */
             color: #ffffff;
-            padding: 20px 40px;
+            padding: 25px 40px;
             border-radius: 8px;
-            font-size: 24px;
-            font-weight: bold;
             text-align: center;
             user-select: none;
             z-index: 10; /* 글씨칸이 이미지보다 위에 오도록 설정 */
+        }
+
+        /* 중앙 박스 내부 텍스트 레이아웃 최적화 */
+        .title-ko {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px; /* 한글과 영어 사이 간격 확보 */
+        }
+
+        .title-en {
+            font-size: 18px;
+            opacity: 0.9; /* 가독성을 위해 살짝 부드럽게 처리 */
         }
 
         /* 숨겨진 1x1 크기의 타겟 버튼 */
@@ -46,19 +56,42 @@
             cursor: default; 
             z-index: 1;
         }
+
+        /* 30초 후 나타날 희미한 힌트 표시용 링 */
+        #hint-ring {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px dashed rgba(0, 0, 255, 0.4); /* 희미한 파란색 점선 원 */
+            border-radius: 50%;
+            pointer-events: none; /* 힌트 원이 클릭을 방해하지 않도록 설정 */
+            transform: translate(-15px, -15px); /* 원의 중심을 1x1 픽셀에 맞춤 */
+            display: none;
+            z-index: 2;
+            animation: blink 1s ease-in-out;
+        }
+
+        /* 힌트 깜빡임 애니메이션 효과 */
+        @keyframes blink {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- 중앙 안내 문구 -->
+    <!-- 중앙 안내 문구 (내부 클래스 정렬 적용) -->
      <div id="center-box">
         <div class="title-ko">M.arnoldi 입자 이미지를 찾으시오🪰</div>
         <div class="title-en">find M.arnoldi particle png🪰</div>
     </div>
 
-
     <!-- 숨겨진 버튼 (클릭 시 이미지 다운로드) -->
     <button id="target-pixel" title="🪰"></button>
+
+    <!-- 힌트 표시용 엘리먼트 -->
+    <div id="hint-ring"></div>
 
     <script>
         // 보내주신 1x1 크기의 83바이트(83b) 실제 남색 이미지 데이터
@@ -66,9 +99,16 @@
         
         const target = document.getElementById('target-pixel');
         const centerBox = document.getElementById('center-box');
+        const hintRing = document.getElementById('hint-ring');
+        
+        let hintTimer = null; // 힌트 타이머 변수
 
         // 랜덤 위치 배치 함수 (중앙 글씨칸 영역 제외)
         function spawnTarget() {
+            // 새 게임이 시작되거나 재배치될 때 기존 힌트 초기화
+            clearTimeout(hintTimer);
+            hintRing.style.display = 'none';
+
             const boxRect = centerBox.getBoundingClientRect();
             let randomX, randomY;
             let insideBox = true;
@@ -92,6 +132,22 @@
             // 위치 지정
             target.style.left = randomX + 'px';
             target.style.top = randomY + 'px';
+
+            // 힌트 링 위치도 타겟과 동일하게 대기 설정
+            hintRing.style.left = randomX + 'px';
+            hintRing.style.top = randomY + 'px';
+
+            // 22초(22000ms) 동안 못 찾으면 힌트 활성화 트리거
+            hintTimer = setTimeout(showHint, 22000);
+        }
+
+        // 힌트를 화면에 깜빡이게 보여주는 함수
+        function showHint() {
+            hintRing.style.display = 'block';
+            // 애니메이션이 끝나면 대상을 지우기 위해 1초 뒤 숨김 처리
+            setTimeout(() => {
+                hintRing.style.display = 'none';
+            }, 1000);
         }
 
         // 페이지 로드 시 타겟 배치
@@ -103,7 +159,7 @@
         target.addEventListener('click', () => {
             const link = document.createElement('a');
             link.href = base64Image;
-    link.download = 'ㄳ.png'; // 다운로드될 파일명을 'ㄳ'로 변경
+            link.download = 'ㄳ.png'; // 다운로드될 파일명을 'ㄳ'로 변경
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
