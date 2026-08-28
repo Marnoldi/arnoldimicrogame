@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>숨은 이미지 찾기 게임</title>
+    <title>find M.arnoldi particle</title>
     <style>
         /* 남색 배경 (#222272) */
         body {
@@ -51,10 +51,14 @@
 <body>
 
     <!-- 중앙 안내 문구 -->
-    <div id="center-box">arnoldi 이미지를 찾으시오</div>
+     <div id="center-box">
+        <div class="title-ko">M.arnoldi 입자 이미지를 찾으시오🪰</div>
+        <div class="title-en">find M.arnoldi particle png🪰</div>
+    </div>
+
 
     <!-- 숨겨진 버튼 (클릭 시 이미지 다운로드) -->
-    <button id="target-pixel" title="정답"></button>
+    <button id="target-pixel" title="🪰"></button>
 
     <script>
         // 보내주신 1x1 크기의 83바이트(83b) 실제 남색 이미지 데이터
@@ -104,7 +108,7 @@
             link.click();
             document.body.removeChild(link);
             
-            alert('arnoldi를 잡았군요.이제 다시 하세요.');
+            alert('중성미자같은 arnoldi를 잡았군요.이제 다시 하세요🪰.\nYou caught an Arnoldi like a neutrino. Now, do it again🪰.');
             spawnTarget(); // 다음 게임을 위해 재배치
         });
     </script>
