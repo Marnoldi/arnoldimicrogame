@@ -100,8 +100,10 @@
     <div id="hint-ring"></div>
 
     <script>
-        // 보내주신 1x1 크기의 83바이트(83b) 실제 남색 이미지 데이터
-        const base64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mMyInb6DwACbQFx690isAAAAABJRU5ErkJggg==";
+        /* ================= [★ 중요: 이 부분을 GitHub 주소로 변경하세요] ================= */
+        // 복사한 GitHub의 Raw 이미지 주소를 아래 큰따옴표 안에 붙여넣으세요.
+        const targetImageURL = "ㄳ.png";
+        /* =========================================================================== */
         
         const target = document.getElementById('target-pixel');
         const centerBox = document.getElementById('center-box');
@@ -173,33 +175,42 @@
             resizeTimeout = setTimeout(spawnTarget, 200);
         };
 
-        /* ================= [수정 및 추가된 부분] ================= */
-        // 성공 시 무작위로 띄울 3가지 메세지 배열 (원하는 문구로 자유롭게 변경 가능)
+        // 성공 시 무작위로 띄울 3가지 메세지 배열
         const successMessages = [
             "중성미자같은 arnoldi를 잡았군요.이제 다시 하세요🪰.\nYou caught an Arnoldi like a neutrino. Now, do it again🪰.",
             "스토리 1:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 중성미자가 되었군요,클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become a neutrino. Click to return to your original place🪰.",
             "스토리 2:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 M.arnoldi 입자가 되었군요,그게 뭔진 다른곳에서 알게 될거고 어쨌든 중성미자와 성질이 비슷한 M.arnoldi 입자가 되었으니,미세한 가능성을 클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become an M. arnoldi particle. You will find out what that is elsewhere, but anyway, since you have become an M. arnoldi particle with properties similar to a neutrino, let's click on a microscopic probability and return to your original place.🪰"
         ];
-        /* ======================================================= */
 
-        // 클릭 시 자동 다운로드 및 랜덤 알림창 기능
-        target.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.href = base64Image;
-            link.download = 'ㄳ.png'; // 다운로드될 파일명을 'ㄳ'로 변경
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
+        // 클릭 시 원격 서버(GitHub) 파일을 가져와 자동 다운로드 및 랜덤 알림창 작동
+        target.addEventListener('click', async () => {
             // 알림창이 뜨는 도중 타이머가 계속 흐르지 않도록 즉시 타이머 클리어
             clearTimeout(hintTimer);
             clearTimeout(hintHideTimer);
 
-            /* ================= [수정 및 추가된 부분] ================= */
+            try {
+                // GitHub 웹 주소의 파일을 다운로드 가능한 블롭(Blob) 데이터로 변환
+                const response = await fetch(targetImageURL);
+                const blob = await response.blob();
+                const downloadURL = window.URL.createObjectURL(blob);
+
+                const link = document.createElement('a');
+                link.href = downloadURL;
+                link.download = 'ㄳ.png'; // 다운로드될 파일명을 'ㄳ'로 변경
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 사용한 메모리 해제
+                window.URL.revokeObjectURL(downloadURL);
+            } catch (error) {
+                console.error("이미지 다운로드 실패:", error);
+                alert("M.arnoldi 입자를 물리적으로 획득하는 데 실패했습니다. (GitHub 주소를 확인해 주세요)");
+            }
+
             // 0, 1, 2 중 하나의 숫자를 무작위로 뽑아 메세지 출력
             const randomIndex = Math.floor(Math.random() * successMessages.length);
             alert(successMessages[randomIndex]);
-            /* ======================================================= */
             
             spawnTarget(); // 다음 게임을 위해 재배치
         });
