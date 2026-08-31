@@ -55,20 +55,26 @@
             /* 마우스 커서가 올라가도 포인터(손가락)로 변하지 않게 하여 난이도 상승 */
             cursor: default; 
             z-index: 1;
+            outline: none; /* 포커스 테두리 제거 */
         }
 
-        /* 30초 후 나타날 희미한 힌트 표시용 링 */
+        /* 22초 후 나타날 희미한 힌트 표시용 링 */
         #hint-ring {
             position: absolute;
             width: 30px;
             height: 30px;
-            border: 2px dashed rgba(0, 0, 255, 0.4); /* 희미한 파란색 점선 원 */
+            border: 2px dashed rgba(255, 255, 255, 0.4); /* 남색 배경 대비 잘 보이도록 흰색 계열 추천 */
             border-radius: 50%;
             pointer-events: none; /* 힌트 원이 클릭을 방해하지 않도록 설정 */
             transform: translate(-15px, -15px); /* 원의 중심을 1x1 픽셀에 맞춤 */
             display: none;
             z-index: 2;
-            animation: blink 1s ease-in-out;
+        }
+
+        /* 자바스크립트로 힌트가 켜졌을 때만 애니메이션이 작동하도록 클래스 분리 */
+        #hint-ring.active {
+            display: block;
+            animation: blink 1s ease-in-out infinite; /* infinite 추가로 무한 깜빡임 */
         }
 
         /* 힌트 깜빡임 애니메이션 효과 */
@@ -87,8 +93,8 @@
         <div class="title-en">find M.arnoldi particle png🪰</div>
     </div>
 
-    <!-- 숨겨진 버튼 (클릭 시 이미지 다운로드) -->
-    <button id="target-pixel" title="🪰"></button>
+    <!-- 숨겨진 버튼 (tabindex="-1"로 치트키 방지) -->
+    <button id="target-pixel" title="🪰" tabindex="-1"></button>
 
     <!-- 힌트 표시용 엘리먼트 -->
     <div id="hint-ring"></div>
@@ -102,21 +108,27 @@
         const hintRing = document.getElementById('hint-ring');
         
         let hintTimer = null; // 힌트 타이머 변수
+        let hintHideTimer = null; // 힌트 숨김 타이머 변수
 
         // 랜덤 위치 배치 함수 (중앙 글씨칸 영역 제외)
         function spawnTarget() {
-            // 새 게임이 시작되거나 재배치될 때 기존 힌트 초기화
+            // 새 게임이 시작되거나 재배치될 때 기존 모든 타이머 및 힌트 초기화
             clearTimeout(hintTimer);
-            hintRing.style.display = 'none';
+            clearTimeout(hintHideTimer);
+            hintRing.classList.remove('active');
 
             const boxRect = centerBox.getBoundingClientRect();
             let randomX, randomY;
             let insideBox = true;
 
+            // 정확한 화면 한계값 계산
+            const maxX = window.innerWidth - target.offsetWidth;
+            const maxY = window.innerHeight - target.offsetHeight;
+
             // 중앙 글씨칸과 겹치지 않을 때까지 무한 반복하여 좌표 생성
             while (insideBox) {
-                randomX = Math.floor(Math.random() * (window.innerWidth - 1));
-                randomY = Math.floor(Math.random() * (window.innerHeight - 1));
+                randomX = Math.floor(Math.random() * maxX);
+                randomY = Math.floor(Math.random() * maxY);
 
                 // 생성된 좌표가 중앙 박스 영역 내부인지 확인
                 if (
@@ -143,19 +155,34 @@
 
         // 힌트를 화면에 깜빡이게 보여주는 함수
         function showHint() {
-            hintRing.style.display = 'block';
-            // 애니메이션이 끝나면 대상을 지우기 위해 1초 뒤 숨김 처리
-            setTimeout(() => {
-                hintRing.style.display = 'none';
+            hintRing.classList.add('active'); // 애니메이션 클래스 부여로 정상 작동 보장
+            
+            // 2.2초 동안 깜빡인 후 숨김 처리
+            hintHideTimer = setTimeout(() => {
+                hintRing.classList.remove('active');
             }, 2200);
         }
 
         // 페이지 로드 시 타겟 배치
         window.onload = spawnTarget;
-        // 창 크기가 바뀔 때를 대비해 재배치 이벤트 등록
-        window.onresize = spawnTarget;
 
-        // 클릭 시 자동 다운로드 기능
+        // 크기 조절 시 디바운싱 효과를 주어 알림창 버그 및 렉 방지
+        let resizeTimeout;
+        window.onresize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(spawnTarget, 200);
+        };
+
+        /* ================= [수정 및 추가된 부분] ================= */
+        // 성공 시 무작위로 띄울 3가지 메세지 배열 (원하는 문구로 자유롭게 변경 가능)
+        const successMessages = [
+            "중성미자같은 arnoldi를 잡았군요.이제 다시 하세요🪰.\nYou caught an Arnoldi like a neutrino. Now, do it again🪰.",
+            "스토리 1:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 중성미자가 되었군요,클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become a neutrino. Click to return to your original place🪰.",
+            "스토리 2:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 M.arnoldi 입자가 되었군요,그게 뭔진 다른곳에서 알게 될거고 어쨌든 중성미자와 성질이 비슷한 M.arnoldi 입자가 되었으니,미세한 가능성을 클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become an M. arnoldi particle. You will find out what that is elsewhere, but anyway, since you have become an M. arnoldi particle with properties similar to a neutrino, let's click on a microscopic probability and return to your original place.🪰"
+        ];
+        /* ======================================================= */
+
+        // 클릭 시 자동 다운로드 및 랜덤 알림창 기능
         target.addEventListener('click', () => {
             const link = document.createElement('a');
             link.href = base64Image;
@@ -164,7 +191,16 @@
             link.click();
             document.body.removeChild(link);
             
-            alert('중성미자같은 arnoldi를 잡았군요.이제 다시 하세요🪰.\nYou caught an Arnoldi like a neutrino. Now, do it again🪰.');
+            // 알림창이 뜨는 도중 타이머가 계속 흐르지 않도록 즉시 타이머 클리어
+            clearTimeout(hintTimer);
+            clearTimeout(hintHideTimer);
+
+            /* ================= [수정 및 추가된 부분] ================= */
+            // 0, 1, 2 중 하나의 숫자를 무작위로 뽑아 메세지 출력
+            const randomIndex = Math.floor(Math.random() * successMessages.length);
+            alert(successMessages[randomIndex]);
+            /* ======================================================= */
+            
             spawnTarget(); // 다음 게임을 위해 재배치
         });
     </script>
