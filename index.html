@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>find M.arnoldi particle</title>
     <style>
-        /* 남색 배경 (#222272) */
         body {
             margin: 0;
             padding: 0;
@@ -17,67 +16,60 @@
             font-family: sans-serif;
         }
 
-        /* 청회색 중앙 글씨칸 */
         #center-box {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #5c6bc0; /* 청회색 */
+            background-color: #5c6bc0;
             color: #ffffff;
             padding: 25px 40px;
             border-radius: 8px;
             text-align: center;
             user-select: none;
-            z-index: 10; /* 글씨칸이 이미지보다 위에 오도록 설정 */
+            z-index: 10; 
         }
 
-        /* 중앙 박스 내부 텍스트 레이아웃 최적화 */
         .title-ko {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 8px; /* 한글과 영어 사이 간격 확보 */
+            margin-bottom: 8px; 
         }
 
         .title-en {
             font-size: 18px;
-            opacity: 0.9; /* 가독성을 위해 살짝 부드럽게 처리 */
+            opacity: 0.9; /
         }
 
-        /* 숨겨진 1x1 크기의 타겟 버튼 */
         #target-pixel {
             position: absolute;
             width: 1px;
             height: 1px;
-            background-color: #222272; /* 배경색과 동일 */
+            background-color: #222272; 
             border: none;
             padding: 0;
-            /* 마우스 커서가 올라가도 포인터(손가락)로 변하지 않게 하여 난이도 상승 */
             cursor: default; 
             z-index: 1;
-            outline: none; /* 포커스 테두리 제거 */
+            outline: none; 
         }
 
-        /* 22초 후 나타날 희미한 힌트 표시용 링 */
         #hint-ring {
             position: absolute;
             width: 30px;
             height: 30px;
-            border: 2px dashed rgba(255, 255, 255, 0.4); /* 남색 배경 대비 잘 보이도록 흰색 계열 추천 */
+            border: 2px dashed rgba(255, 255, 255, 0.4); 
             border-radius: 50%;
-            pointer-events: none; /* 힌트 원이 클릭을 방해하지 않도록 설정 */
-            transform: translate(-15px, -15px); /* 원의 중심을 1x1 픽셀에 맞춤 */
+            pointer-events: none; 
+            transform: translate(-15px, -15px); 
             display: none;
             z-index: 2;
         }
 
-        /* 자바스크립트로 힌트가 켜졌을 때만 애니메이션이 작동하도록 클래스 분리 */
         #hint-ring.active {
             display: block;
-            animation: blink 1s ease-in-out infinite; /* infinite 추가로 무한 깜빡임 */
+            animation: blink 1s ease-in-out infinite; 
         }
 
-        /* 힌트 깜빡임 애니메이션 효과 */
         @keyframes blink {
             0% { opacity: 0; }
             50% { opacity: 1; }
@@ -87,34 +79,27 @@
 </head>
 <body>
 
-    <!-- 중앙 안내 문구 (내부 클래스 정렬 적용) -->
      <div id="center-box">
         <div class="title-ko">M.arnoldi 입자 이미지를 찾으시오🪰</div>
         <div class="title-en">find M.arnoldi particle png🪰</div>
     </div>
 
-    <!-- 숨겨진 버튼 (tabindex="-1"로 치트키 방지) -->
     <button id="target-pixel" title="🪰" tabindex="-1"></button>
 
-    <!-- 힌트 표시용 엘리먼트 -->
     <div id="hint-ring"></div>
 
     <script>
-        /* ================= [★ 중요: 이 부분을 GitHub 주소로 변경하세요] ================= */
-        // 복사한 GitHub의 Raw 이미지 주소를 아래 큰따옴표 안에 붙여넣으세요.
         const targetImageURL = "ㄳ.png";
-        /* =========================================================================== */
         
         const target = document.getElementById('target-pixel');
         const centerBox = document.getElementById('center-box');
         const hintRing = document.getElementById('hint-ring');
         
-        let hintTimer = null; // 힌트 타이머 변수
-        let hintHideTimer = null; // 힌트 숨김 타이머 변수
+        let hintTimer = null; 
+        let hintHideTimer = null; 
 
-        // 랜덤 위치 배치 함수 (중앙 글씨칸 영역 제외)
         function spawnTarget() {
-            // 새 게임이 시작되거나 재배치될 때 기존 모든 타이머 및 힌트 초기화
+            // 초기화
             clearTimeout(hintTimer);
             clearTimeout(hintHideTimer);
             hintRing.classList.remove('active');
@@ -123,16 +108,13 @@
             let randomX, randomY;
             let insideBox = true;
 
-            // 정확한 화면 한계값 계산
             const maxX = window.innerWidth - target.offsetWidth;
             const maxY = window.innerHeight - target.offsetHeight;
 
-            // 중앙 글씨칸과 겹치지 않을 때까지 무한 반복하여 좌표 생성
             while (insideBox) {
                 randomX = Math.floor(Math.random() * maxX);
                 randomY = Math.floor(Math.random() * maxY);
 
-                // 생성된 좌표가 중앙 박스 영역 내부인지 확인
                 if (
                     randomX >= boxRect.left && randomX <= boxRect.right &&
                     randomY >= boxRect.top && randomY <= boxRect.bottom
@@ -143,76 +125,64 @@
                 }
             }
 
-            // 위치 지정
             target.style.left = randomX + 'px';
             target.style.top = randomY + 'px';
 
-            // 힌트 링 위치도 타겟과 동일하게 대기 설정
             hintRing.style.left = randomX + 'px';
             hintRing.style.top = randomY + 'px';
 
-            // 22초(22000ms) 동안 못 찾으면 힌트 활성화 트리거
             hintTimer = setTimeout(showHint, 22000);
         }
 
-        // 힌트를 화면에 깜빡이게 보여주는 함수
         function showHint() {
-            hintRing.classList.add('active'); // 애니메이션 클래스 부여로 정상 작동 보장
+            hintRing.classList.add('active'); 
             
-            // 2.2초 동안 깜빡인 후 숨김 처리
+            // 2.2초
             hintHideTimer = setTimeout(() => {
                 hintRing.classList.remove('active');
             }, 2200);
         }
 
-        // 페이지 로드 시 타겟 배치
         window.onload = spawnTarget;
 
-        // 크기 조절 시 디바운싱 효과를 주어 알림창 버그 및 렉 방지
         let resizeTimeout;
         window.onresize = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(spawnTarget, 200);
         };
 
-        // 성공 시 무작위로 띄울 3가지 메세지 배열
         const successMessages = [
             "중성미자같은 arnoldi를 잡았군요.이제 다시 하세요🪰.\nYou caught an Arnoldi like a neutrino. Now, do it again🪰.",
             "스토리 1:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 중성미자가 되었군요,클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become a neutrino. Click to return to your original place🪰.",
             "스토리 2:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 M.arnoldi 입자가 되었군요,그게 뭔진 다른곳에서 알게 될거고 어쨌든 중성미자와 성질이 비슷한 M.arnoldi 입자가 되었으니,미세한 가능성을 클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become an M. arnoldi particle. You will find out what that is elsewhere, but anyway, since you have become an M. arnoldi particle with properties similar to a neutrino, let's click on a microscopic probability and return to your original place.🪰"
         ];
 
-        // 클릭 시 원격 서버(GitHub) 파일을 가져와 자동 다운로드 및 랜덤 알림창 작동
         target.addEventListener('click', async () => {
-            // 알림창이 뜨는 도중 타이머가 계속 흐르지 않도록 즉시 타이머 클리어
             clearTimeout(hintTimer);
             clearTimeout(hintHideTimer);
 
             try {
-                // GitHub 웹 주소의 파일을 다운로드 가능한 블롭(Blob) 데이터로 변환
                 const response = await fetch(targetImageURL);
                 const blob = await response.blob();
                 const downloadURL = window.URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
                 link.href = downloadURL;
-                link.download = 'ㄳ.png'; // 다운로드될 파일명을 'ㄳ'로 변경
+                link.download = 'ㄳ.png'; // 'ㄳ'
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 
-                // 사용한 메모리 해제
                 window.URL.revokeObjectURL(downloadURL);
             } catch (error) {
                 console.error("이미지 다운로드 실패:", error);
                 alert("megapropodiphora arnoldi가 될뻔 했습니다.(GitHub 주소를 확인해 주세요)");
             }
 
-            // 0, 1, 2 중 하나의 숫자를 무작위로 뽑아 메세지 출력
             const randomIndex = Math.floor(Math.random() * successMessages.length);
             alert(successMessages[randomIndex]);
             
-            spawnTarget(); // 다음 게임을 위해 재배치
+            spawnTarget();
         });
     </script>
 </body>
