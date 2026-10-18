@@ -38,7 +38,7 @@
 
         .title-en {
             font-size: 18px;
-            opacity: 0.9; /
+            opacity: 0.9;
         }
 
         #target-pixel {
@@ -84,13 +84,11 @@
         <div class="title-en">find M.arnoldi particle png🪰</div>
     </div>
 
-    <button id="target-pixel" title="🪰" tabindex="-1"></button>
+    <button id="target-pixel" tabindex="-1"></button>
 
     <div id="hint-ring"></div>
 
     <script>
-        const targetImageURL = "ㄳ.png";
-        
         const target = document.getElementById('target-pixel');
         const centerBox = document.getElementById('center-box');
         const hintRing = document.getElementById('hint-ring');
@@ -99,7 +97,6 @@
         let hintHideTimer = null; 
 
         function spawnTarget() {
-            // 초기화
             clearTimeout(hintTimer);
             clearTimeout(hintHideTimer);
             hintRing.classList.remove('active');
@@ -137,7 +134,6 @@
         function showHint() {
             hintRing.classList.add('active'); 
             
-            // 2.2초
             hintHideTimer = setTimeout(() => {
                 hintRing.classList.remove('active');
             }, 2200);
@@ -157,7 +153,7 @@
             "스토리 2:당신은 그저 방금 번데기에서 깨어난 megapropodiphora arnoldi입니다.그러나 이 우주 시뮬레이션에 버그가 생겨 당신이 M.arnoldi 입자가 되었군요,그게 뭔진 다른곳에서 알게 될거고 어쨌든 중성미자와 성질이 비슷한 M.arnoldi 입자가 되었으니,미세한 가능성을 클릭하여 당신의 원래 자리로 돌아갑시다🪰.\nYou are simply a Megapropodiphora arnoldi that has just emerged from its pupa. However, a bug has occurred in this cosmic simulation, and you have become an M. arnoldi particle. You will find out what that is elsewhere, but anyway, since you have become an M. arnoldi particle with properties similar to a neutrino, let's click on a microscopic probability and return to your original place.🪰"
         ];
 
-        target.addEventListener('click', async () => {
+        target.addEventListener('click', () => {
             clearTimeout(hintTimer);
             clearTimeout(hintHideTimer);
 
@@ -166,23 +162,18 @@
                 canvas.width = 1;
                 canvas.height = 1;
                 const ctx = canvas.getContext('2d');
+
                 ctx.fillStyle = '#222272';
                 ctx.fillRect(0, 0, 1, 1);
 
-                canvas.toBlob((blob) => {
-                    if (!blob) throw new Error("megapropodiphora arnoldi가 될뻔 했습니다.");
-                    const downloadURL = window.URL.createObjectURL(blob);
+                const downloadURL = canvas.toDataURL('image/png');
 
-                    const link = document.createElement('a');
-                    link.href = downloadURL;
-                    link.download = 'ㄳ.png';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    
-                    window.URL.revokeObjectURL(downloadURL);
-                }, 'image/png');
-
+                const link = document.createElement('a');
+                link.href = downloadURL;
+                link.download = 'ㄳ.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             } catch (error) {
                 console.error("이미지 다운로드 실패:", error);
                 alert("megapropodiphora arnoldi가 될뻔 했습니다.");
@@ -196,3 +187,4 @@
     </script>
 </body>
 </html>
+
