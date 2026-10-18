@@ -162,18 +162,27 @@
             clearTimeout(hintHideTimer);
 
             try {
-                const response = await fetch(targetImageURL);
-                const blob = await response.blob();
-                const downloadURL = window.URL.createObjectURL(blob);
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#222272';
+                ctx.fillRect(0, 0, 1, 1);
 
-                const link = document.createElement('a');
-                link.href = downloadURL;
-                link.download = 'ㄳ.png'; // 'ㄳ'
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                window.URL.revokeObjectURL(downloadURL);
+                canvas.toBlob((blob) => {
+                    if (!blob) throw new Error("megapropodiphora arnoldi가 될뻔 했습니다.");
+                    const downloadURL = window.URL.createObjectURL(blob);
+
+                    const link = document.createElement('a');
+                    link.href = downloadURL;
+                    link.download = 'ㄳ.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    window.URL.revokeObjectURL(downloadURL);
+                }, 'image/png');
+
             } catch (error) {
                 console.error("이미지 다운로드 실패:", error);
                 alert("megapropodiphora arnoldi가 될뻔 했습니다.");
